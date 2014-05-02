@@ -26,26 +26,28 @@ function Unlock-TheKrakken{
     $results = @()
 
     if($computer -ne "") {
-        $nics = @()
         # Get a list of all NIC names
-        $ifrslt = Invoke-RemoteWmiProcess $kill "netsh interface show interface"
-        if($ifrslt -ne $null) {
-            $ifstr = $ifrslt.Details
-            $lines = $ifstr -split "\r\n"
-            if($lines -ne $null) {
-                #parse each line from output and extract the name of the interface
-                foreach($line in $lines) {
-                    if(($line -notlike "*Admin State*") -and ($line -notlike "*-------*")) {
-                        $parts = $line -split "   "
-                        if($parts -ne $null) {
-                            $idx = 0
-                            foreach($part in $parts) {
-                                if($part.Trim() -ne "") {
-                                    if($idx -eq 3) {
-                                        $nics += $part.Trim()
-                                    }
-                                    else {
-                                        $idx++
+        if(Test-Path function:\Invoke-RemoteWmiProcess) {
+            $nics = @()
+            $ifrslt = Invoke-RemoteWmiProcess $kill "netsh interface show interface"
+            if($ifrslt -ne $null) {
+                $ifstr = $ifrslt.Details
+                $lines = $ifstr -split "\r\n"
+                if($lines -ne $null) {
+                    #parse each line from output and extract the name of the interface
+                    foreach($line in $lines) {
+                        if(($line -notlike "*Admin State*") -and ($line -notlike "*-------*")) {
+                            $parts = $line -split "   "
+                            if($parts -ne $null) {
+                                $idx = 0
+                                foreach($part in $parts) {
+                                    if($part.Trim() -ne "") {
+                                        if($idx -eq 3) {
+                                            $nics += $part.Trim()
+                                        }
+                                        else {
+                                            $idx++
+                                        }
                                     }
                                 }
                             }
@@ -53,13 +55,17 @@ function Unlock-TheKrakken{
                     }
                 }
             }
-        }
-        if($nics -ne $null) {
-            #disable each NIC found
-            foreach($nic in $nics) {
-                $results += Invoke-RemoteWmiProcess $kill "cmd /c netsh interface set interface name=`"$($nic)`" admin=disabled" -noredirect -nowait
+            if($nics -ne $null) {
+                #disable each NIC found
+                foreach($nic in $nics) {
+                    $results += Invoke-RemoteWmiProcess $kill "cmd /c netsh interface set interface name=`"$($nic)`" admin=disabled" -noredirect -nowait
+                }
             }
         }
+        else {
+            Write-Output "You are missing the Invoke-RemoteWmiProcess CmdLet. Go download from https://github.com/PoshSec/PoshSec/tree/PoshSec/Utility-Functions"
+        }        
+        
         if($results -ne $null) {
             $results
         }
