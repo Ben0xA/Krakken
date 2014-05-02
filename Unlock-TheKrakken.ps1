@@ -15,7 +15,6 @@ function Unlock-TheKrakken{
    			https://github.com/ben0xa/krakken/
 		.NOTES
 			AUTHOR: Ben0xA
-  			This function is a utility function for the PoshSec module.
 
             REQUIRES: PoshSec/Utility-Functions/Invoke-RemoteWmiProcess
 	#>
