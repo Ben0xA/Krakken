@@ -9,7 +9,7 @@ function Unlock-TheKrakken{
   			The remote system on which to start the process.
 	  
 		.EXAMPLE
-  			PS> Unlock-TheKrakken -computer REMOTEPC
+  			PS> Unlock-TheKrakken -kill REMOTEPC
 
 		.LINK
    			https://github.com/ben0xa/krakken/
